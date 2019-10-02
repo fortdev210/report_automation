@@ -11,10 +11,8 @@ var mainUrl = '1Msj3CmSd7BI9vxdqQ44vgKIBzdN7sBGa5CZfmtKkWpA';
 
 // Get Current Month
 var month = Utilities.formatDate(new Date(), 'PST', 'MMMM');
-// Get Sheet By Name
-var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Worksheet");
 
-function formatSheet() {
+function formatSheet(sheet) {
   var range = sheet.getDataRange();
   var rangeVals = range.getValues();
   // Delete Unnecessary Columns
@@ -37,14 +35,14 @@ function formatSheet() {
   }
 }
 
-function deleteRows() {
+function deleteRows(sheet) {
+  var range = sheet.getDataRange();
+  var rangeVals = range.getValues();
   // Remove Unnecessary Rows
   var delAngelaVal = "CH Internal-Angela Harper"; // Delete Value In "Project" Column 
   var delPMVal1 = "PM Activities"; // Delete Value In Name Column
   var delPMVal2 = "Project Management"; // Delete Value In Name Column
 
-  var range = sheet.getDataRange();
-  var rangeVals = range.getValues();
   for (var i = rangeVals.length - 1; i >= 0; i--) {
     // Delete PM Activities, Project Management(Name), or CH Internal-Anglea Harper(Project)
     if (rangeVals[i][0].toString().toLowerCase() === delPMVal1.toLowerCase() ||
@@ -55,7 +53,39 @@ function deleteRows() {
   }
 }
 
+function fixDuplicateName(sheet) {
+  var rangeVals = sheet.getRange('A2:C').sort(1).getValues();
+  var rowLength = sheet.getLastRow() - 1;
+
+  // Get Duplicate Names In Array
+  var dupArray = [];
+  var flag = false;
+  for (var i = 0; i < rowLength - 1; i++) {
+    if (rangeVals[i][0] == rangeVals[i + 1][0] && rangeVals[i][1] != rangeVals[i + 1][1]) {
+      if (flag == false) {
+        dupArray.push(i + 2);
+        dupArray.push(i + 3);
+        flag = true;
+      } else {
+        dupArray.push(i + 3);
+      }
+    } else {
+      flag = false;
+    }
+  }
+  Utilities.sleep(3000);
+  // Fix Duplicate Names By Adding Hypen & Project Name (i.e Landing Page -> Landing Page-Image3D)
+  for (var i = 0; i < dupArray.length; i++) {
+    var index = dupArray[i];
+    sheet.getRange(index, 1).setBackground('yellow');
+    sheet.getRange(index, 1).setValue(rangeVals[index - 2][0] + '-' + rangeVals[index - 2][1]);
+  }
+}
+
 function dailyReport() {
-  formatSheet();
-  deleteRows();
+  // Get Sheet By Name
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Worksheet");
+  //  formatSheet(sheet);
+  //  deleteRows(sheet);
+  fixDuplicateName(sheet);
 }
