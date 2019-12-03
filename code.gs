@@ -2,8 +2,10 @@
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
   ui.createMenu('Automation')
-    .addItem('Daily Report', 'dailyReport')
-    .addItem('Monthly Report', 'monthlyReport')
+    .addItem('Daily Hours Logged Report', 'logReport')
+    .addItem('Daily Hours New Month Creation', 'newMonthCreate')
+    .addItem('Es Vs Actual Daily Report', 'dailyReport')
+    .addItem('Es Vs Actual Monthly Report', 'monthlyReport')
     .addToUi();
 }
 // Project Detail Tracking Sheet URL
@@ -23,8 +25,8 @@ function formatSheet(sheet) {
     sheet.deleteColumns(4, 2); // Delete X, Y Columns
 
     // Beautify Sheet Format
-    sheet.setColumnWidth(1, 200);
-    sheet.setColumnWidth(2, 1000);
+    sheet.setColumnWidth(1, 300);
+    sheet.setColumnWidth(2, 600);
     sheet.setColumnWidth(3, 100);
 
     // Rearrange Columns Order
@@ -53,7 +55,7 @@ function deleteRows(sheet) {
   }
 }
 
-function fixDuplicateName(sheet) {
+function fixSameNameDifferentProject(sheet) {
   var rangeVals = sheet.getRange('A2:C').sort(1).getValues();
   var rowLength = sheet.getLastRow() - 1;
 
@@ -82,10 +84,82 @@ function fixDuplicateName(sheet) {
   }
 }
 
+function fixSameNameSameProject(sheet) {
+  var rangeVals = sheet.getRange('A2:C').sort(1).getValues();
+  var rowLength = sheet.getLastRow() - 1;
+
+  // Get Duplicate Names In Array
+  var dupArray = [];
+  var flag = false;
+  for (var i = 0; i < rowLength - 1; i++) {
+    if (rangeVals[i][0] == rangeVals[i + 1][0] && rangeVals[i][1] == rangeVals[i + 1][1]) {
+      if (flag == false) {
+        dupArray.push(i + 2);
+        dupArray.push(i + 3);
+        flag = true;
+      } else {
+        dupArray.push(i + 3);
+      }
+    } else {
+      flag = false;
+    }
+  }
+  Utilities.sleep(3000);
+  // Fix Duplicate Names By Adding Hypen & Project Name (i.e Landing Page -> Landing Page-Image3D)
+  for (var i = 0; i < dupArray.length; i++) {
+    var index = dupArray[i];
+    sheet.getRange(index, 1).setBackground('yellow');
+    sheet.getRange(index, 1).setValue(rangeVals[index - 2][0] + '-' + (i + 1));
+  }
+}
+
+function modifyDuplicateValues(sheet) {
+  var rangeVals = sheet.getRange('A2:C').sort(1).getValues();
+  var rowLength = sheet.getLastRow() - 1;
+
+  // Get Duplicate Names In Array
+  var dupArray = [];
+  var flag = false;
+  for (var i = 0; i < rowLength - 1; i++) {
+    if (rangeVals[i][0] == rangeVals[i + 1][0]) {
+      if (flag == false) {
+        dupArray.push(i + 2);
+        dupArray.push(i + 3);
+        flag = true;
+      } else {
+        dupArray.push(i + 3);
+      }
+    } else {
+      flag = false;
+    }
+  }
+  Utilities.sleep(3000);
+  // Fix Duplicate Names By Adding Hypen & Project Name (i.e Landing Page -> Landing Page-Image3D)
+  for (var i = 0; i < dupArray.length; i++) {
+    var index = dupArray[i];
+    sheet.getRange(index, 1).setBackground('yellow');
+    sheet.getRange(index, 1).setValue(rangeVals[index - 2][0] + '-' + (i + 1));
+  }
+}
+
+// function compare(sheet) {
+
+// }
+
 function dailyReport() {
   // Get Sheet By Name
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Worksheet");
-  //  formatSheet(sheet);
-  //  deleteRows(sheet);
-  fixDuplicateName(sheet);
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("assignment_filter");
+  formatSheet(sheet);
+  deleteRows(sheet);
+  // fixSameNameDifferentProject(sheet);
+  // fixSameNameSameProject(sheet);
+  modifyDuplicateValues(sheet);
+}
+
+function logReport () {
+  return;
+}
+
+function monthlyReport () {
+  return;
 }
