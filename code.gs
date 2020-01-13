@@ -2,10 +2,10 @@
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
   ui.createMenu('Automation')
-    .addItem('Daily Hours Logged Report', 'logReport')
-    .addItem('Daily Hours New Month Creation', 'newMonthCreate')
     .addItem('Es Vs Actual Daily Report', 'dailyReport')
     .addItem('Es Vs Actual Monthly Report', 'monthlyReport')
+    .addItem('Daily Hours Logged Report', 'logReport')
+    .addItem('Daily Hours New Month Creation', 'newMonthCreate')
     .addToUi();
 }
 // Project Detail Tracking Sheet URL
@@ -154,12 +154,16 @@ function dailyReport() {
   // fixSameNameDifferentProject(sheet);
   // fixSameNameSameProject(sheet);
   modifyDuplicateValues(sheet);
+  
 }
 
-function logReport () {
+function monthlyReport() {
+
+}
+function logReport() {
   return;
 }
 
-function monthlyReport () {
+function newMonthCreate() {
   return;
 }
